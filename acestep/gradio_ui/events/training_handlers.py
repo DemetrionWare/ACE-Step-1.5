@@ -461,6 +461,26 @@ import time
 import re
 
 
+def list_checkpoints(lora_output_dir: str):
+    """Scan for checkpoint directories and return a Dropdown update.
+
+    Returns:
+        gr.update for the resume_checkpoint Dropdown
+    """
+    choices = [""]
+    checkpoint_dir = os.path.join(lora_output_dir, "checkpoints")
+    if os.path.isdir(checkpoint_dir):
+        dirs = [
+            d for d in os.listdir(checkpoint_dir)
+            if os.path.isdir(os.path.join(checkpoint_dir, d)) and d.startswith("epoch_")
+        ]
+        # Sort numerically by epoch number
+        dirs.sort(key=lambda x: int(x.split("_")[1]))
+        for d in dirs:
+            choices.append(os.path.join(checkpoint_dir, d))
+    return gr.update(choices=choices, value="")
+
+
 def _format_duration(seconds):
     """Format seconds to human readable string."""
     seconds = int(seconds)
@@ -486,6 +506,7 @@ def start_training(
     training_shift: float,
     training_seed: int,
     lora_output_dir: str,
+    resume_from: str,
     training_state: Dict,
     progress=None,
 ):
@@ -562,8 +583,11 @@ def start_training(
         step_list = []
         loss_list = []
         
+        # Normalize resume_from (empty string → None)
+        resume_path = resume_from.strip() if resume_from else None
+
         # Train with progress updates using preprocessed tensors
-        for step, loss, status in trainer.train_from_preprocessed(tensor_dir, training_state):
+        for step, loss, status in trainer.train_from_preprocessed(tensor_dir, training_state, resume_from=resume_path):
             # Calculate elapsed time and ETA
             elapsed_seconds = time.time() - start_time
             time_info = f"⏱️ Elapsed: {_format_duration(elapsed_seconds)}"

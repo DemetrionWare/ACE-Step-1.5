@@ -477,7 +477,17 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         placeholder="./lora_output",
                         info="Directory to save trained LoRA weights",
                     )
-                
+
+                with gr.Row():
+                    resume_checkpoint = gr.Dropdown(
+                        choices=[""] ,
+                        value="",
+                        label="Resume from Checkpoint",
+                        info="Select a checkpoint to resume training (leave empty to start fresh)",
+                        scale=3,
+                    )
+                    refresh_checkpoints_btn = gr.Button("🔄 Refresh", variant="secondary", scale=1)
+
                 gr.HTML("<hr>")
                 
                 with gr.Row():
@@ -599,6 +609,8 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
         "training_shift": training_shift,
         "training_seed": training_seed,
         "lora_output_dir": lora_output_dir,
+        "resume_checkpoint": resume_checkpoint,
+        "refresh_checkpoints_btn": refresh_checkpoints_btn,
         "start_training_btn": start_training_btn,
         "stop_training_btn": stop_training_btn,
         "training_progress": training_progress,

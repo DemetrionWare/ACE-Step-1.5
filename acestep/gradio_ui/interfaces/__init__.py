@@ -31,7 +31,7 @@ def create_gradio_interface(dit_handler, llm_handler, dataset_handler, init_para
     
     with gr.Blocks(
         title=t("app.title"),
-        theme=gr.themes.Soft(),
+        theme=gr.themes.Origin(),
         css="""
         .main-header {
             text-align: center;

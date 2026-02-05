@@ -438,8 +438,8 @@ class DatasetBuilder:
             Duration in seconds (integer)
         """
         try:
-            info = torchaudio.info(audio_path)
-            return int(info.num_frames / info.sample_rate)
+            audio, sr = torchaudio.load(audio_path)
+            return int(audio.shape[1] / sr)
         except Exception as e:
             logger.warning(f"Failed to get duration for {audio_path}: {e}")
             return 0
